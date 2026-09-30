@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carnival of Service · Costume Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#12080a; --bg2:#1d0f12; --ink:#f4e2bf; --ink2:#e6cf9f; --muted:#b39a72;
+  --red:#c8102e; --red2:#8f0b20; --gold:#e9b949; --gold2:#ffd36b; --line:#e9b949;
+  --card:#f6e6c4; --cardink:#1a1412; --shadow:0 3px 0 #000;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:'Alegreya Sans','Gill Sans','Trebuchet MS',sans-serif;font-size:17px;line-height:1.4;
+  background:var(--bg) radial-gradient(ellipse at 50% -10%,#5a1020 0,#2a0a12 40%,#12080a 75%);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(90deg,rgba(200,16,46,.10) 0 60px,transparent 60px 120px)}
+.marquee{height:22px;position:relative;border-top:3px solid var(--gold);border-bottom:3px solid var(--gold);background:linear-gradient(180deg,#2a0a12,#12080a)}
+.marquee::before{content:'';position:absolute;inset:4px 0;background:radial-gradient(circle,#ffd36b 0 4px,#ff9a2a 5px,transparent 6px) 0 50%/28px 14px repeat-x;animation:twinkle 1.2s steps(2) infinite}
+@keyframes twinkle{50%{filter:brightness(.55)}}
+header{padding:22px 20px 10px;max-width:1100px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.kicker{font-size:13px;letter-spacing:4px;text-transform:uppercase;font-weight:700;color:var(--gold2);display:inline-block;padding:4px 14px;border:2px solid var(--gold);border-radius:20px;background:#12080a}
+h1{font-family:'Rye',serif;font-size:clamp(38px,8vw,78px);margin:8px 0 0;line-height:.95;text-transform:uppercase;color:#f6e6c4;
+  text-shadow:0 0 12px rgba(255,211,107,.35),0 3px 0 #8f0b20,0 6px 0 #4a0510,0 8px 14px rgba(0,0,0,.8);letter-spacing:1px}
+.sub{margin:10px auto 0;font-style:italic;color:var(--ink2);max-width:640px;font-size:18px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px 40px;position:relative;z-index:1}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 0 6px;scrollbar-width:none;position:sticky;top:env(safe-area-inset-top,0px);background:linear-gradient(180deg,#12080a 80%,transparent);z-index:5}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:2px solid var(--gold);background:#1d0f12;color:var(--ink);padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;min-height:44px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;border-radius:6px}
+.tab small{font-weight:400;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.tab[aria-selected="true"]{background:var(--red);color:#fff;border-color:#ffd36b;box-shadow:0 0 0 3px #12080a,0 0 0 5px var(--gold)}
+.tab[aria-selected="true"] small{color:#ffd36b}
+.panel{border:3px solid var(--gold);background:var(--card);color:var(--cardink);padding:14px 16px;margin:12px 0;border-radius:8px;box-shadow:0 0 0 2px #12080a,0 0 0 4px var(--red2),0 10px 24px rgba(0,0,0,.6)}
+.panel h2{font-family:'Rye',serif;font-size:22px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;color:var(--red)}
+.panel h2::before,.panel h2::after{content:' ★ ';color:var(--gold)}
+.panel .status{color:#6a5b55}
+.panel.look{background:linear-gradient(180deg,#fff3d6,#f6e6c4);border-color:var(--gold2)}
+.lookhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.panel.look h2::before,.panel.look h2::after{content:''}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.row>*{flex:1 1 180px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+input,select,textarea{font:inherit;font-size:16px;padding:9px 10px;border:2px solid #1a1412;background:#fffaf0;color:#1a1412;min-height:44px;width:100%;border-radius:4px}
+textarea{min-height:44px;resize:vertical}
+.btn{font:inherit;font-weight:700;border:2px solid #1a1412;background:var(--red);color:#fff;padding:10px 16px;cursor:pointer;min-height:44px;box-shadow:var(--shadow);border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:#fffaf0;color:#1a1412}
+.btn.small{padding:6px 10px;min-height:38px;font-size:14px}
+.status{font-size:14px;color:var(--muted);margin-top:8px;min-height:1.2em}
+.preview{display:none;margin-top:10px;max-width:220px;border:2px solid #1a1412}
+.preview img{display:block;width:100%;height:auto}
+.toolbar{display:flex;flex-direction:column;gap:8px;margin:14px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:2px solid var(--gold);background:#1d0f12;color:var(--ink);padding:4px 10px;font-size:14px;border-radius:20px}
+.chip b{color:var(--gold2)}
+.chip.lbl{background:var(--red);color:#fff;border-color:#ffd36b;font-family:'Rye',serif;text-transform:uppercase;letter-spacing:1px}
+.chip.filter{cursor:pointer}
+.chip.filter.on{background:var(--gold);color:#1a1412;border-color:#fff}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px;align-items:start}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.col{border:3px solid var(--gold);border-radius:10px;padding:12px;background:rgba(0,0,0,.35);box-shadow:0 0 0 2px #12080a,0 0 0 4px var(--red2)}
+.colhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:2px solid var(--gold);padding-bottom:6px;margin-bottom:10px}
+.colhead h2{font-family:'Rye',serif;font-size:clamp(22px,3vw,30px);margin:0;text-transform:uppercase;color:var(--gold2);letter-spacing:1px;text-shadow:0 2px 0 #8f0b20}
+.colhead .hint{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+.col .chips{margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.card{border:3px solid var(--gold);background:var(--card);color:var(--cardink);display:flex;flex-direction:column;box-shadow:0 0 0 2px #12080a,0 8px 18px rgba(0,0,0,.6);border-radius:8px;overflow:hidden}
+.card .ph{position:relative;aspect-ratio:1;background:#2a1a10;overflow:hidden;cursor:pointer;border:0;padding:0;width:100%}
+.card .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.card .ph .rank{position:absolute;top:6px;left:6px;background:var(--gold2);color:#1a1412;font-family:'Rye',serif;padding:3px 8px;font-size:14px;border:2px solid #1a1412;border-radius:4px}
+.card .meta{padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.card .name{font-weight:700;font-size:16px;line-height:1.2}
+.card .site{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#6a5b55}
+.card .cap{font-size:14px;color:#3a2e2a;font-style:italic}
+.card .acts{display:flex;gap:6px;align-items:center;padding:0 10px 10px}
+.vote{flex:1 1 auto;font:inherit;font-weight:700;border:2px solid #1a1412;background:#fffaf0;color:#1a1412;padding:8px;min-height:44px;cursor:pointer;border-radius:4px}
+.vote.mine{background:var(--red);color:#fff}
+.vote:disabled{opacity:.6;cursor:not-allowed}
+.rx{font:inherit;font-size:15px;border:2px solid #1a1412;background:#fffaf0;color:#1a1412;padding:6px 8px;min-height:44px;cursor:pointer;border-radius:4px;white-space:nowrap}
+.rx.on{background:var(--gold2);border-color:#8f0b20}
+.rxrow{display:flex;gap:6px;padding:0 10px 10px}
+.rxrow .rx{flex:1 1 0}
+.del{font:inherit;border:2px solid #1a1412;background:#fffaf0;color:var(--red);font-weight:700;padding:8px 10px;min-height:44px;cursor:pointer;border-radius:4px}
+.empty{text-align:center;padding:40px 10px;color:var(--muted);font-style:italic}
+.admin{border:3px dashed var(--gold);background:#1d0f12;color:var(--ink);padding:12px 16px;margin:12px 0;display:none;border-radius:8px}
+.admin.on{display:block}
+.admin h2{font-family:'Rye',serif;font-size:18px;margin:0 0 6px;color:var(--gold2);text-transform:uppercase;letter-spacing:1px}
+.admin .row{align-items:center}
+.admin .row>*{flex:0 1 auto}
+.admin summary{color:var(--gold2)}
+.daytable{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+.daytable th,.daytable td{border:1px solid #5a3a2a;padding:6px 8px;text-align:center}
+.daytable td:first-child,.daytable th:first-child{text-align:left}
+.daytable input[type=checkbox]{width:22px;height:22px;min-height:0}
+.daytable tr.cur td{background:#2a0a12}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1a1412;color:var(--ink);padding:10px 16px;border:2px solid var(--gold2);display:none;max-width:90vw;z-index:20;border-radius:6px}
+.lb{position:fixed;inset:0;background:rgba(10,4,5,.94);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
+.lb.on{display:flex}
+.lb .box{background:var(--card);color:var(--cardink);border:3px solid var(--gold2);max-width:min(900px,96vw);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;border-radius:8px}
+.lb img{max-width:100%;max-height:70vh;object-fit:contain;display:block;background:#000}
+.lb .info{padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.lb .close{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;font:inherit;font-size:16px;font-weight:700;background:var(--gold2);color:#1a1412;border:2px solid #1a1412;padding:8px 12px;min-height:44px;cursor:pointer;border-radius:4px}
+.lb .box .status{color:#6a5b55}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30px;position:relative;z-index:1}
+.spin{width:22px;height:22px;border:3px solid #1a1412;border-top-color:var(--red);border-radius:50%;animation:s 1s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes s{to{transform:rotate(360deg)}}
+.dayrow{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:8px;align-items:center;margin-top:10px;padding-bottom:8px;border-bottom:1px solid #5a3a2a}
+.dayrow input[type=text]{min-height:40px;padding:6px 8px}
+@media(max-width:600px){.dayrow{grid-template-columns:auto 1fr 1fr}.dayrow input.dt{display:none}}
+</style>
+</head>
+<body>
+<div class="marquee"></div>
+<header>
+  <div class="kicker" id="hKicker">Client Service Appreciation Week · Oct 5–9</div>
+  <h1 id="hTitle">Carnival of Service!!!</h1>
+  <p class="sub" id="hSub">Costume gallery. Post your photo, then vote for one Americor favorite and one Vendor favorite each day.</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <section class="panel look" id="lookPanel">
+    <div class="lookhead"><span class="chip lbl" id="lookDay">Monday</span><h2 id="lookTheme" style="margin:0">Step Right Up</h2></div>
+    <p id="lookDesc" style="margin:8px 0 0;font-size:17px;line-height:1.4"></p>
+  </section>
+  <section class="panel" id="uploadPanel">
+    <h2 id="uploadTitle">Post your photo</h2>
+    <div class="row">
+      <label>Your name <input id="fName" maxlength="60" placeholder="First and last" autocomplete="name"></label>
+      <label>Site / team
+        <select id="fSite"></select>
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label style="flex:2 1 260px">Caption (optional) <input id="fCap" maxlength="120" placeholder="Who or what are you?"></label>
+      <label>Photo <input id="fFile" type="file" accept="image/*"></label>
+    </div>
+    <div class="preview" id="preview"><img id="previewImg" alt="Preview of the photo you picked"></div>
+    <div class="row" style="margin-top:12px;align-items:center">
+      <button class="btn" id="btnUpload" style="flex:0 1 auto">Post to the gallery</button>
+      <div class="status" id="upStatus" style="flex:1 1 200px;margin:0"></div>
+    </div>
+  </section>
+
+  <section class="admin" id="admin">
+    <h2>Backend controls (admin)</h2>
+    <div style="font-size:14px;color:var(--muted)">End of day routine: close uploads, lock voting, export the winners, then hide the tab and the next day is live. Hidden days stay visible to you here (marked HIDDEN) but disappear for everyone else.</div>
+    <table class="daytable" id="dayTable"><tr><th>Day</th><th>Close uploads</th><th>Lock voting</th><th>Hide tab</th></tr></table>
+    <div class="status">A red Remove button appears on every photo while you are signed in. Removing is permanent.</div>
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center">Event setup (title, look, days, sites)</summary>
+      <div class="row" style="margin-top:8px">
+        <label>Small line above title <input id="eKicker"></label>
+        <label>Big title <input id="eTitle"></label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label style="flex:2 1 260px">Subtitle <input id="eSub"></label>
+        <label style="flex:0 1 160px">Accent color <input id="eAccent" type="color" style="height:44px;padding:2px"></label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label style="flex:2 1 260px">Sites / teams (comma separated) <input id="eSites"></label>
+        <label style="flex:2 1 260px">Which of those are vendor sites (comma separated; the rest count as Americor) <input id="eVendor"></label>
+      </div>
+      <div style="font-size:14px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:12px">Days / categories</div>
+      <div id="eDays"></div>
+      <div class="row" style="margin-top:10px;align-items:center">
+        <button class="btn" id="eSave" style="flex:0 1 auto">Save event setup</button>
+        <span class="status" id="eStatus" style="margin:0"></span>
+      </div>
+    </details>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center">Export and reset</summary>
+      <div class="row" style="margin-top:8px;align-items:center">
+        <button class="btn ghost" id="xCsv" style="flex:0 1 auto">Download results (CSV)</button>
+        <button class="btn ghost" id="xExport" style="flex:0 1 auto">Download everything (zip)</button>
+        <button class="btn" id="xClear" style="flex:0 1 auto;background:var(--red2)">Clear all photos and votes</button>
+        <span class="status" id="xStatus" style="margin:0;flex:1 1 200px"></span>
+      </div>
+      <div style="font-size:14px;color:var(--muted);margin-top:6px">The CSV has one row per photo (day, population, rank, votes, hearts, laughs) plus a winners block at the bottom; it opens straight into Google Sheets. The zip adds every full-size photo sorted by day and population. Export before you clear. Clearing removes all photos and votes but keeps the event setup, so you can retitle it and run the next event.</div>
+    </details>
+  </section>
+
+  <div id="notice" class="status" style="text-align:center"></div>
+  <div class="split">
+    <section class="col" id="colV">
+      <div class="colhead"><h2>Vendors</h2><div class="hint">Vote for one</div></div>
+      <div class="chips" id="leadersV"></div>
+      <div class="chips" id="sitesV"></div>
+      <div class="grid" id="gridV"></div>
+      <div class="empty" id="emptyV">No vendor photos yet today.</div>
+    </section>
+    <section class="col" id="colA">
+      <div class="colhead"><h2>Americor</h2><div class="hint">Vote for one</div></div>
+      <div class="chips" id="leadersA"></div>
+      <div class="chips" id="sitesA"></div>
+      <div class="grid" id="gridA"></div>
+      <div class="empty" id="emptyA">No Americor photos yet today.</div>
+    </section>
+  </div>
+</div>
+<footer>Photos are visible to everyone with this link. Keep it work-appropriate; leadership can remove anything. <a href="#" id="adminLink" style="color:var(--red)">Admin sign-in</a></footer>
+<div class="lb" id="adminDlg" role="dialog" aria-modal="true">
+  <div class="box" style="padding:18px;max-width:420px;width:100%">
+    <h2 style="font-family:'Rye',serif;margin:0 0 10px;text-transform:uppercase;font-size:20px">Admin sign-in</h2>
+    <label>Email <input id="aEmail" type="email" autocomplete="username"></label>
+    <label style="margin-top:8px">Password <input id="aPass" type="password" autocomplete="current-password"></label>
+    <div class="status" id="aStatus"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="aGo">Sign in</button><button class="btn ghost" id="aCancel">Cancel</button><button class="btn ghost" id="aOut" style="display:none">Sign out</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="lb" id="lb" aria-modal="true" role="dialog">
+  <button class="close" id="lbClose" aria-label="Close">Close</button>
+  <div class="box">
+    <img id="lbImg" alt="">
+    <div class="info">
+      <div><div class="name" id="lbName" style="font-weight:700;font-size:18px"></div><div class="site" id="lbSite" style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)"></div><div class="cap" id="lbCap" style="font-style:italic;color:var(--ink2)"></div></div>
+      <div style="display:flex;gap:6px;flex:0 0 auto"><button class="vote" id="lbVote" style="min-width:120px"></button><button class="rx" id="lbH"></button><button class="rx" id="lbL"></button></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// =====================================================================
+//  SETUP: paste your Firebase web app config here (Firebase console >
+//  Project settings > Your apps > Web app > SDK setup and configuration)
+// =====================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCmgCjG85EYxktlMjnwrDBtq-vjeIVawfY",
+  authDomain: "carnival-of-screams-531ce.firebaseapp.com",
+  projectId: "carnival-of-screams-531ce",
+  appId: "1:661234346389:web:e47bcfb77214a7a4cbae9c"
+};
+// =====================================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const DEFAULT_EVENT = {
+  kicker: 'Client Service Appreciation Week · Oct 5–9',
+  title: 'Carnival of Service!!!',
+  sub: 'Costume gallery. Post your photo, then vote for one Americor favorite and one Vendor favorite each day.',
+  accent: '#b3261e',
+  sites: ['Americor','Americor Leadership','Americor DR','Buwelo Colombia','Buwelo PH','Vendor Leadership','Other'],
+  vendorSites: ['Americor DR','Buwelo Colombia','Buwelo PH','Vendor Leadership'],
+  days: [
+    {k:'mon', on:true, label:'Monday',    theme:'Step Right Up',            date:'2026-10-05', desc:'Classic carnival: red and white stripes, bold checks, polka dots, ringmaster hats, bow ties, suspenders, vests. No time? A striped shirt and a bow tie.'},
+    {k:'tue', on:true, label:'Tuesday',   theme:'Fun House',                date:'2026-10-06', desc:'Mismatched everything: patterns, socks, shoes. Clothes inside out or backwards, wild hair, giant glasses, clashing colors. Zero shopping required.'},
+    {k:'wed', on:true, label:'Wednesday', theme:'Wicked: Clowns vs Ghosts', date:'2026-10-07', desc:'Pick a side. Team Clown: face paint, red nose, ruffled collar, wild wig. Team Ghost: all white, gauze, pale face. Silly clown is always allowed. No full-face masks in 1:1s or team meetings unless asked.'},
+    {k:'thu', on:true, label:'Thursday',  theme:'Carnival After Dark',      date:'2026-10-08', desc:'The lights went out at the carnival. All black head to toe: hoodie, beanie, hood up, dark or smoky makeup, pale face. Move slow and quiet. You are the shadow.'},
+    {k:'fri', on:true, label:'Friday',    theme:'Walking Dead',             date:'2026-10-09', desc:'Zombie version of a celebrity or character, your favorite villain, or a good ole classic zombie: torn clothes, gray face, dark eyes. Costume contest finals today.'},
+    {k:'sat', on:true, label:'Saturday',  theme:'Fun House (Weekend Warriors)', date:'2026-10-10', desc:'Mismatched everything: patterns, socks, shoes. Clothes inside out or backwards, wild hair, giant glasses, clashing colors.'},
+    {k:'sun', on:true, label:'Sunday',    theme:'Clowns vs Ghosts (Weekend Warriors)', date:'2026-10-11', desc:'Pick a side. Team Clown: face paint, red nose, ruffled collar, wild wig. Team Ghost: all white, gauze, pale face. Silly clown is always allowed.'},
+  ]
+};
+const ALL_KEYS = ['mon','tue','wed','thu','fri','sat','sun'];
+let EVENT = JSON.parse(JSON.stringify(DEFAULT_EVENT));
+let DAYS = EVENT.days.filter(d => d.on);
+function applyEvent(){
+  DAYS = EVENT.days.filter(d => d.on); if (!DAYS.length) DAYS = [EVENT.days[0]];
+  $('hKicker').textContent = EVENT.kicker; $('hTitle').textContent = EVENT.title; $('hSub').textContent = EVENT.sub;
+  document.documentElement.style.setProperty('--red', EVENT.accent);
+  const sel = $('fSite'); const cur = sel.value; sel.innerHTML = '';
+  EVENT.sites.forEach(x => { const o = document.createElement('option'); o.textContent = x; sel.appendChild(o); });
+  if (cur && EVENT.sites.includes(cur)) sel.value = cur;
+  if (!DAYS.some(d => d.k === day)) day = DAYS[0].k;
+  renderTabs(); fillEventForm();
+}
+function fillEventForm(){
+  if (!$('eDays')) return;
+  $('eKicker').value = EVENT.kicker; $('eTitle').value = EVENT.title; $('eSub').value = EVENT.sub; $('eAccent').value = EVENT.accent; $('eSites').value = EVENT.sites.join(', '); $('eVendor').value = (EVENT.vendorSites||[]).join(', ');
+  const box = $('eDays'); box.innerHTML = '';
+  EVENT.days.forEach((d, i) => {
+    const row = document.createElement('div'); row.className = 'dayrow';
+    row.innerHTML = '<input type="checkbox" style="width:22px;height:22px;min-height:0" ' + (d.on?'checked':'') + ' data-i="'+i+'" data-f="on">'
+      + '<input type="text" placeholder="Tab label (Monday)" value="" data-i="'+i+'" data-f="label">'
+      + '<input type="text" placeholder="Theme (Step Right Up)" value="" data-i="'+i+'" data-f="theme">'
+      + '<input type="text" class="dt" placeholder="Date YYYY-MM-DD" value="" data-i="'+i+'" data-f="date">'
+      + '<input type="text" style="grid-column:1/-1" placeholder="What to wear (shown above the upload box on this day)" maxlength="400" data-i="'+i+'" data-f="desc">';
+    row.querySelector('[data-f=label]').value = d.label; row.querySelector('[data-f=theme]').value = d.theme; row.querySelector('[data-f=date]').value = d.date || ''; row.querySelector('[data-f=desc]').value = d.desc || '';
+    box.appendChild(row);
+  });
+}
+function readEventForm(){
+  const days = EVENT.days.map((d, i) => Object.assign({}, d));
+  document.querySelectorAll('#eDays [data-f]').forEach(inp => { const i = +inp.dataset.i, f = inp.dataset.f; days[i][f] = f === 'on' ? inp.checked : inp.value.trim(); });
+  return { kicker: $('eKicker').value.trim(), title: $('eTitle').value.trim() || 'Photo Gallery', sub: $('eSub').value.trim(), accent: $('eAccent').value || '#b3261e',
+    sites: $('eSites').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 12), vendorSites: $('eVendor').value.split(',').map(x => x.trim()).filter(Boolean), days };
+}
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s);
+
+let db = null, uid = null, isAdmin = false;
+let day = pickDefaultDay();
+let photos = [], votes = {}, myVoteDoc = null, settings = {locked:{}, closed:{}, hidden:{}};
+let rx = {};   // photoId -> {h:count, l:count}
+let unsubPhotos = null;
+const fullCache = new Map(), pending = new Map();
+
+function pickDefaultDay(){
+  const t = new Date(); const iso = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  const hit = DAYS.find(x => x.date === iso); if (hit) return hit.k;
+  try { const s = localStorage.getItem('cos-day'); if (s && DAYS.some(x=>x.k===s)) return s; } catch(e){}
+  return DAYS[0].k;
+}
+function toast(msg, ms){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.display='none', ms||3200); }
+
+function renderTabs(){
+  const el = $('tabs'); el.innerHTML='';
+  const visible = DAYS.filter(d => isAdmin || !(settings.hidden||{})[d.k]);
+  if (!visible.length) { el.innerHTML='<span class="chip">The gallery opens soon. Check back on the first dress-up day.</span>'; $('uploadPanel').style.display='none'; ['gridV','gridA'].forEach(g=>$(g).innerHTML=''); ['emptyV','emptyA'].forEach(g=>$(g).style.display='none'); return; }
+  $('uploadPanel').style.display='';
+  if (!visible.some(d => d.k===day)) { day = visible[0].k; if (db) subscribeDay(); }
+  visible.forEach(d => {
+    const b = document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected', String(d.k===day));
+    const s = document.createElement('small'); s.textContent = d.label + ((settings.hidden||{})[d.k] ? ' · HIDDEN' : ''); b.appendChild(s); b.appendChild(document.createTextNode(d.theme));
+    b.addEventListener('click', ()=>{ if (d.k!==day){ day=d.k; try{localStorage.setItem('cos-day',day);}catch(e){} renderTabs(); subscribeDay(); } });
+    el.appendChild(b);
+  });
+  const cd = DAYS.find(x=>x.k===day) || DAYS[0];
+  $('uploadTitle').textContent = 'Post your ' + cd.label + ' photo';
+  $('lookDay').textContent = cd.label + (cd.date ? ' · ' + cd.date.slice(5).replace('-', '/') : ''); $('lookTheme').textContent = cd.theme; $('lookDesc').textContent = cd.desc || ''; $('lookPanel').style.display = cd.desc ? '' : 'none';
+}
+
+// ---- image resize: thumb (grid) + full (lightbox) ----
+function loadImg(file){ return new Promise((res,rej)=>{ const img=new Image(); const url=URL.createObjectURL(file); img.onload=()=>{URL.revokeObjectURL(url);res(img)}; img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('That file could not be read as an image.'))}; img.src=url; }); }
+function shrink(img, max, q, cap){
+  let w=img.naturalWidth, h=img.naturalHeight; const s=Math.min(1,max/Math.max(w,h)); w=Math.round(w*s); h=Math.round(h*s);
+  const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h);
+  let out=c.toDataURL('image/jpeg',q); while(out.length>cap && q>0.4){ q-=0.08; out=c.toDataURL('image/jpeg',q); } return out;
+}
+let picked = null;
+$('fFile').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; picked=null; $('preview').style.display='none'; if (!f) return;
+  try { const img = await loadImg(f); picked = { thumb: shrink(img, 480, 0.72, 60000), full: shrink(img, 1000, 0.8, 350000) }; $('previewImg').src = picked.thumb; $('preview').style.display='block'; $('upStatus').textContent=''; }
+  catch(err){ $('upStatus').textContent = err.message; }
+});
+
+$('btnUpload').addEventListener('click', async () => {
+  const name = $('fName').value.trim(), site = $('fSite').value, cap = $('fCap').value.trim();
+  if (!db || !uid) return $('upStatus').textContent = 'Still connecting. Try again in a moment.';
+  if (settings.closed[day]) return $('upStatus').textContent = 'Uploads are closed for this day.';
+  if (!name) return $('upStatus').textContent = 'Add your name so people know who to vote for.';
+  if (!picked) return $('upStatus').textContent = 'Pick a photo first.';
+  const btn = $('btnUpload'); btn.disabled = true; $('upStatus').innerHTML = '<span class="spin"></span> Posting…';
+  try {
+    const id = day + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,7);
+    await setDoc(doc(db,'images',id), { data: picked.full });
+    await setDoc(doc(db,'photos',id), { day, name, site, caption: cap, uid, at: Date.now(), thumb: picked.thumb });
+    fullCache.set(id, picked.full);
+    picked=null; $('fFile').value=''; $('fCap').value=''; $('preview').style.display='none';
+    $('upStatus').textContent = 'Posted. Nice work.';
+    try { localStorage.setItem('cos-name', name); localStorage.setItem('cos-site', site); } catch(e){}
+  } catch(err) { console.error(err); $('upStatus').textContent = 'Upload failed (' + (err.code || 'error') + '). Try a smaller photo.'; }
+  btn.disabled = false;
+});
+
+function subscribeDay(){
+  if (unsubPhotos) { unsubPhotos(); unsubPhotos=null; }
+  photos=[]; render(); if (!db) return;
+  unsubPhotos = onSnapshot(query(collection(db,'photos'), where('day','==',day)), snap => {
+    photos = snap.docs.map(d => Object.assign({id:d.id}, d.data())); render();
+  }, e => { $('notice').textContent = 'Live updates stopped (' + e.code + '). Reload the page.'; });
+}
+function subscribeShared(){
+  onSnapshot(collection(db,'votes'), snap => {
+    const counts = {};
+    const rc = {};
+    snap.docs.forEach(d => { const v=d.data(); Object.keys(v).forEach(k => { if (k!=='at' && typeof v[k]==='string' && v[k]) counts[v[k]]=(counts[v[k]]||0)+1; }); if (v.rx && typeof v.rx==='object') Object.keys(v.rx).forEach(pid => { const r = String(v.rx[pid]||''); rc[pid] = rc[pid] || {h:0,l:0}; if (r.includes('h')) rc[pid].h++; if (r.includes('l')) rc[pid].l++; }); if (d.id===uid) myVoteDoc=v; });
+    votes = counts; rx = rc; render();
+  });
+  onSnapshot(doc(db,'settings','main'), s => { settings = s.exists() ? Object.assign({locked:{},closed:{},hidden:{}}, s.data()) : {locked:{},closed:{},hidden:{}}; renderTabs(); render(); });
+  onSnapshot(doc(db,'settings','event'), s => {
+    if (s.exists()) { const e = s.data(); EVENT = Object.assign(JSON.parse(JSON.stringify(DEFAULT_EVENT)), e); if (!Array.isArray(EVENT.days)) EVENT.days = DEFAULT_EVENT.days; DEFAULT_EVENT.days.forEach(dd => { if (!EVENT.days.some(x => x.k === dd.k)) EVENT.days.push(Object.assign({}, dd)); }); EVENT.days = EVENT.days.filter(x => ALL_KEYS.includes(x.k)); EVENT.days.forEach(x => { if (x.desc == null) { const dd = DEFAULT_EVENT.days.find(y => y.k === x.k); x.desc = dd ? dd.desc : ''; } }); }
+    const prev = day; applyEvent(); if (prev !== day) subscribeDay(); else render();
+  });
+}
+// ---- event setup ----
+$('eSave').addEventListener('click', async () => {
+  $('eStatus').textContent = 'Saving…';
+  try { await setDoc(doc(db,'settings','event'), readEventForm()); $('eStatus').textContent = 'Saved. Everyone sees the new setup on their next refresh.'; }
+  catch(err){ $('eStatus').textContent = 'Could not save (' + (err.code||'error') + ').'; }
+});
+// ---- export ----
+$('xExport').addEventListener('click', async () => {
+  if (!window.JSZip) return toast('Zip library did not load. Reload and try again.');
+  const st = $('xStatus'); st.innerHTML = '<span class="spin"></span> Collecting photos…';
+  try {
+    const zip = new JSZip();
+    const ph = (await getDocs(collection(db,'photos'))).docs.map(d => Object.assign({id:d.id}, d.data()));
+    const vt = (await getDocs(collection(db,'votes'))).docs.map(d => d.data());
+    const counts = {}, rcx = {}; vt.forEach(v => { Object.keys(v).forEach(k => { if (k!=='at' && typeof v[k]==='string' && v[k]) counts[v[k]] = (counts[v[k]]||0)+1; }); if (v.rx && typeof v.rx==='object') Object.keys(v.rx).forEach(pid => { const r=String(v.rx[pid]||''); rcx[pid]=rcx[pid]||{h:0,l:0}; if(r.includes('h')) rcx[pid].h++; if(r.includes('l')) rcx[pid].l++; }); });
+    const safe = x => String(x||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,40) || 'unnamed';
+    const dayName = k => (EVENT.days.find(d => d.k === k) || {label:k}).label;
+    let n = 0;
+    for (const p of ph) {
+      st.innerHTML = '<span class="spin"></span> Photo ' + (++n) + ' of ' + ph.length;
+      let data = null; try { const im = await getDoc(doc(db,'images',p.id)); if (im.exists()) data = im.data().data; } catch(e){}
+      const b64 = (data || p.thumb || '').split(',')[1]; if (!b64) continue;
+      zip.file(safe(dayName(p.day)) + '/' + ((EVENT.vendorSites||[]).includes(p.site)?'Vendors':'Americor') + '/' + safe(p.name) + '_' + safe(p.site) + '_' + (counts[p.id]||0) + 'votes_' + p.id + '.jpg', b64, {base64:true});
+    }
+    const csv = ['day,population,name,site,caption,votes,hearts,laughs,posted,id'].concat(ph.sort((a,b)=> a.day.localeCompare(b.day) || (counts[b.id]||0)-(counts[a.id]||0)).map(p =>
+      [dayName(p.day), (EVENT.vendorSites||[]).includes(p.site)?'Vendors':'Americor', p.name, p.site, p.caption||'', counts[p.id]||0, (rcx[p.id]||{}).h||0, (rcx[p.id]||{}).l||0, new Date(p.at||0).toISOString(), p.id].map(x => '"' + String(x).replace(/"/g,'""') + '"').join(','))).join('\n');
+    zip.file('votes.csv', csv);
+    zip.file('event-setup.json', JSON.stringify(EVENT, null, 2));
+    st.innerHTML = '<span class="spin"></span> Building zip…';
+    const blob = await zip.generateAsync({type:'blob'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = safe(EVENT.title) + '_photos.zip'; document.body.appendChild(a); a.click(); a.remove();
+    st.textContent = 'Exported ' + n + ' photos.';
+  } catch(err){ st.textContent = 'Export failed (' + (err.code||err.message) + ').'; }
+});
+// ---- results CSV (opens in Google Sheets / Excel) ----
+async function gatherResults(){
+  const ph = (await getDocs(collection(db,'photos'))).docs.map(d => Object.assign({id:d.id}, d.data()));
+  const vt = (await getDocs(collection(db,'votes'))).docs.map(d => d.data());
+  const counts = {}, rcx = {};
+  vt.forEach(v => { Object.keys(v).forEach(k => { if (k!=='at' && typeof v[k]==='string' && v[k]) counts[v[k]] = (counts[v[k]]||0)+1; }); if (v.rx && typeof v.rx==='object') Object.keys(v.rx).forEach(pid => { const r=String(v.rx[pid]||''); rcx[pid]=rcx[pid]||{h:0,l:0}; if(r.includes('h')) rcx[pid].h++; if(r.includes('l')) rcx[pid].l++; }); });
+  const dayName = k => (EVENT.days.find(d => d.k === k) || {label:k}).label;
+  const dayOrder = k => Math.max(0, EVENT.days.findIndex(d => d.k === k));
+  const pop = p => (EVENT.vendorSites||[]).includes(p.site) ? 'Vendors' : 'Americor';
+  // rank within each day + population: votes desc, then earlier post wins ties
+  const groups = {};
+  ph.forEach(p => { const g = p.day + '|' + pop(p); (groups[g] = groups[g] || []).push(p); });
+  const rank = {};
+  Object.values(groups).forEach(list => { list.sort((a,b) => ((counts[b.id]||0)-(counts[a.id]||0)) || ((a.at||0)-(b.at||0))).forEach((p,i) => { rank[p.id] = (counts[p.id]||0) > 0 ? i+1 : ''; }); });
+  const rows = ph.slice().sort((a,b) => dayOrder(a.day)-dayOrder(b.day) || pop(a).localeCompare(pop(b)) || ((rank[a.id]||999)-(rank[b.id]||999)) || ((counts[b.id]||0)-(counts[a.id]||0)));
+  const q = x => '"' + String(x==null?'':x).replace(/"/g,'""') + '"';
+  const lines = ['Day,Population,Rank,Winner,Name,Site,Caption,Votes,Hearts,Laughs,Posted,Photo ID'];
+  rows.forEach(p => lines.push([dayName(p.day), pop(p), rank[p.id], rank[p.id]===1?'1st place':rank[p.id]===2?'2nd place':'', p.name, p.site, p.caption||'', counts[p.id]||0, (rcx[p.id]||{}).h||0, (rcx[p.id]||{}).l||0, new Date(p.at||0).toLocaleString(), p.id].map(q).join(',')));
+  // winners summary block at the bottom
+  lines.push('', 'WINNERS BY DAY', 'Day,Population,Place,Name,Site,Votes');
+  EVENT.days.filter(d=>d.on).forEach(d => ['Americor','Vendors'].forEach(pp => { (groups[d.k+'|'+pp]||[]).filter(p => rank[p.id]===1 || rank[p.id]===2).sort((a,b)=>rank[a.id]-rank[b.id]).forEach(p => lines.push([d.label, pp, rank[p.id]===1?'1st':'2nd', p.name, p.site, counts[p.id]||0].map(q).join(','))); }));
+  return '\ufeff' + lines.join('\r\n');
+}
+$('xCsv').addEventListener('click', async () => {
+  const st = $('xStatus'); st.innerHTML = '<span class="spin"></span> Building CSV…';
+  try { const csv = await gatherResults(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download = (EVENT.title||'gallery').replace(/[^\w]+/g,'_') + '_results.csv'; document.body.appendChild(a); a.click(); a.remove(); st.textContent = 'CSV downloaded. Open it in Google Sheets: File → Import → Upload.'; }
+  catch(err){ st.textContent = 'Export failed (' + (err.code||err.message) + ').'; }
+});
+// ---- clear ----
+$('xClear').addEventListener('click', async () => {
+  if (!confirm('Delete ALL photos and votes for every day? Export first if you have not.')) return;
+  if (prompt('Type DELETE to confirm') !== 'DELETE') return;
+  const st = $('xStatus'); st.innerHTML = '<span class="spin"></span> Clearing…';
+  try {
+    for (const col of ['votes','images','photos']) {
+      const snap = await getDocs(collection(db,col)); let batch = writeBatch(db), i = 0;
+      for (const d of snap.docs) { batch.delete(d.ref); if (++i % 400 === 0) { await batch.commit(); batch = writeBatch(db); } }
+      await batch.commit();
+    }
+    await setDoc(doc(db,'settings','main'), {locked:{}, closed:{}});
+    st.textContent = 'Cleared. Ready for the next event.'; toast('All photos and votes removed.');
+  } catch(err){ st.textContent = 'Clear failed (' + (err.code||err.message) + '). Make sure the updated rules are published.'; }
+});
+
+async function react(photoId, kind){
+  if (!db || !uid) return toast('Still connecting.');
+  const cur = Object.assign({}, myVoteDoc || {}); const m = Object.assign({}, cur.rx || {}); let r = String(m[photoId]||'');
+  r = r.includes(kind) ? r.replace(kind,'') : r + kind; if (r) m[photoId] = r; else delete m[photoId]; cur.rx = m; cur.at = Date.now();
+  try { await setDoc(doc(db,'votes',uid), cur); myVoteDoc = cur; render(); } catch(err){ toast('Could not save that reaction.'); }
+}
+function isVendorPhoto(p){ return !!p && (EVENT.vendorSites||[]).includes(p.site); }
+function voteKeyFor(p){ return day + (isVendorPhoto(p) ? '_v' : ''); }
+async function vote(photoId){
+  if (!db || !uid) return toast('Still connecting.');
+  if (settings.locked[day]) return toast('Voting is locked for this day.');
+  const p = photos.find(x=>x.id===photoId); const k = voteKeyFor(p);
+  const cur = Object.assign({}, myVoteDoc || {}); const same = cur[k]===photoId;
+  if (same) delete cur[k]; else cur[k]=photoId; cur.at = Date.now();
+  try { await setDoc(doc(db,'votes',uid), cur); myVoteDoc=cur; render(); toast(same ? 'Vote removed.' : ('Vote counted for ' + (isVendorPhoto(p)?'Vendors':'Americor') + '. You get one pick in each group per day.'), 4000); }
+  catch(err){ toast('Vote failed. Try again.'); }
+}
+async function removePhoto(p){
+  if (!confirm('Remove "' + p.name + '"\'s photo? This cannot be undone.')) return;
+  try { await deleteDoc(doc(db,'photos',p.id)); await deleteDoc(doc(db,'images',p.id)); fullCache.delete(p.id); toast('Photo removed.'); }
+  catch(err){ toast('Could not remove (' + (err.code||'error') + ').'); }
+}
+async function saveSetting(key, val, dayKey){
+  const next = { locked: Object.assign({}, settings.locked), closed: Object.assign({}, settings.closed), hidden: Object.assign({}, settings.hidden||{}) }; next[key][dayKey||day]=val;
+  try { await setDoc(doc(db,'settings','main'), next); } catch(err){ toast('Could not save setting (admin only).'); }
+}
+function renderDayTable(){
+  const t = $('dayTable'); if (!t) return; t.querySelectorAll('tr:not(:first-child)').forEach(r=>r.remove());
+  EVENT.days.filter(d=>d.on).forEach(d => {
+    const tr = document.createElement('tr'); if (d.k===day) tr.className='cur';
+    tr.innerHTML = '<td><b>'+esc(d.label)+'</b> · '+esc(d.theme)+'</td>' + ['closed','locked','hidden'].map(k => '<td><input type="checkbox" data-k="'+k+'" data-d="'+d.k+'" '+((settings[k]||{})[d.k]?'checked':'')+'></td>').join('');
+    tr.querySelectorAll('input').forEach(cb => cb.addEventListener('change', e => saveSetting(e.target.dataset.k, e.target.checked, e.target.dataset.d)));
+    t.appendChild(tr);
+  });
+}
+
+async function loadFull(id, imgEl){
+  const c = fullCache.get(id); if (c) { if (c!=='missing') imgEl.src=c; return; }
+  if (pending.has(id)) { const d = await pending.get(id); if (d!=='missing') imgEl.src=d; return; }
+  const pr = getDoc(doc(db,'images',id)).then(s => (s.exists() && s.data().data) || 'missing').catch(()=>'missing');
+  pending.set(id, pr); const data = await pr; pending.delete(id); fullCache.set(id, data);
+  if (data!=='missing') imgEl.src=data;
+}
+
+function sorted(){ return photos.slice().sort((a,b) => ((votes[b.id]||0)-(votes[a.id]||0)) || ((b.at||0)-(a.at||0))); }
+function makeCard(p, i){
+  const myPick = myVoteDoc ? myVoteDoc[voteKeyFor(p)] : null; const locked = !!settings.locked[day];
+  const card=document.createElement('div'); card.className='card';
+  const ph=document.createElement('button'); ph.className='ph'; ph.setAttribute('aria-label','Open photo by '+esc(p.name));
+  const img=document.createElement('img'); img.alt=esc(p.name)+(p.caption?' — '+esc(p.caption):''); img.src=p.thumb||''; img.loading='lazy'; ph.appendChild(img);
+  if (i<3 && (votes[p.id]||0)>0){ const r=document.createElement('span'); r.className='rank'; r.textContent=['1st','2nd','3rd'][i]; ph.appendChild(r); }
+  ph.addEventListener('click', ()=>openLb(p)); card.appendChild(ph);
+  const meta=document.createElement('div'); meta.className='meta';
+  const nm=document.createElement('div'); nm.className='name'; nm.textContent=esc(p.name); meta.appendChild(nm);
+  const st=document.createElement('div'); st.className='site'; st.textContent=esc(p.site); meta.appendChild(st);
+  if (p.caption){ const cp=document.createElement('div'); cp.className='cap'; cp.textContent=esc(p.caption); meta.appendChild(cp); }
+  card.appendChild(meta);
+  const acts=document.createElement('div'); acts.className='acts';
+  const vb=document.createElement('button'); vb.className='vote'+(myPick===p.id?' mine':''); vb.textContent=(myPick===p.id?'Your vote · ':'Vote · ')+(votes[p.id]||0); vb.disabled=locked; vb.addEventListener('click',()=>vote(p.id)); acts.appendChild(vb);
+  const mine = String((myVoteDoc && myVoteDoc.rx && myVoteDoc.rx[p.id]) || ''); const rc = rx[p.id] || {h:0,l:0};
+  const rxrow=document.createElement('div'); rxrow.className='rxrow';
+  [['h','❤️',rc.h],['l','😂',rc.l]].forEach(([k,e,n]) => { const b=document.createElement('button'); b.className='rx'+(mine.includes(k)?' on':''); b.setAttribute('aria-label', (k==='h'?'Heart':'Laugh')+' this photo'); b.textContent = e + ' ' + (n||0); b.addEventListener('click', ()=>react(p.id,k)); rxrow.appendChild(b); });
+  if (isAdmin || (uid && p.uid===uid)){ const del=document.createElement('button'); del.className='del'; del.textContent=isAdmin?'Remove':'Delete mine'; del.addEventListener('click',()=>removePhoto(p)); acts.appendChild(del); }
+  card.appendChild(acts); card.appendChild(rxrow); return card;
+}
+function renderCol(suffix, grp){
+  const grid=$('grid'+suffix); grid.innerHTML=''; grp.forEach((p,i)=>grid.appendChild(makeCard(p,i)));
+  $('empty'+suffix).style.display = grp.length ? 'none' : 'block';
+  const L=$('leaders'+suffix); L.innerHTML='';
+  const top=grp.filter(p=>(votes[p.id]||0)>0).slice(0,3);
+  if (top.length) top.forEach((p,i)=>{ const c=document.createElement('span'); c.className='chip'; c.innerHTML='<b>'+['1st','2nd','3rd'][i]+'</b> '; c.appendChild(document.createTextNode(esc(p.name)+' ('+votes[p.id]+')')); L.appendChild(c); });
+  else { const c=document.createElement('span'); c.className='chip'; c.textContent = grp.length ? 'No votes yet. Cast the first one.' : 'Leaderboard'; L.appendChild(c); }
+  const S=$('sites'+suffix); S.innerHTML=''; const bySite={}; grp.forEach(p=>{ bySite[p.site]=(bySite[p.site]||0)+(votes[p.id]||0); });
+  Object.entries(bySite).sort((a,b)=>b[1]-a[1]).forEach(([s,n])=>{ const c=document.createElement('span'); c.className='chip'; c.textContent=s+': '+n; S.appendChild(c); });
+}
+function render(){
+  const listAll = sorted(); const isV = p => (EVENT.vendorSites||[]).includes(p.site);
+  const locked = !!settings.locked[day], closed = !!settings.closed[day];
+  $('notice').textContent = locked ? 'Voting is locked for this day. Results are final.' : (closed ? 'Uploads are closed for this day.' : '');
+  $('btnUpload').disabled = closed;
+  renderCol('V', listAll.filter(isV)); renderCol('A', listAll.filter(p=>!isV(p)));
+  if (isAdmin) renderDayTable();
+  $('admin').classList.toggle('on', isAdmin);
+  if (lbPhoto) syncLb();
+}
+
+let lbPhoto=null;
+function openLb(p){ lbPhoto=p; $('lb').classList.add('on'); syncLb(); $('lbImg').src=p.thumb||''; loadFull(p.id, $('lbImg')); }
+function syncLb(){ const p=photos.find(x=>x.id===lbPhoto.id)||lbPhoto; $('lbName').textContent=esc(p.name); $('lbSite').textContent=esc(p.site); $('lbCap').textContent=esc(p.caption||''); $('lbImg').alt=esc(p.name);
+  const myPick=myVoteDoc?myVoteDoc[voteKeyFor(p)]:null; const b=$('lbVote'); b.className='vote'+(myPick===p.id?' mine':''); b.textContent=(myPick===p.id?'Your vote · ':'Vote · ')+(votes[p.id]||0); b.disabled=!!settings.locked[day]; b.onclick=()=>vote(p.id);
+  const mine = String((myVoteDoc && myVoteDoc.rx && myVoteDoc.rx[p.id]) || ''); const rc = rx[p.id] || {h:0,l:0};
+  $('lbH').className='rx'+(mine.includes('h')?' on':''); $('lbH').textContent='❤️'+(rc.h?' '+rc.h:''); $('lbH').onclick=()=>react(p.id,'h');
+  $('lbL').className='rx'+(mine.includes('l')?' on':''); $('lbL').textContent='😂'+(rc.l?' '+rc.l:''); $('lbL').onclick=()=>react(p.id,'l'); }
+$('lbClose').addEventListener('click',()=>{ $('lb').classList.remove('on'); lbPhoto=null; });
+$('lb').addEventListener('click',e=>{ if(e.target===$('lb')){ $('lb').classList.remove('on'); lbPhoto=null; } });
+
+// ---- admin sign-in ----
+$('adminLink').addEventListener('click', e => { e.preventDefault(); $('adminDlg').classList.add('on'); $('aOut').style.display = isAdmin ? '' : 'none'; });
+$('aCancel').addEventListener('click', ()=>$('adminDlg').classList.remove('on'));
+$('adminDlg').addEventListener('click', e=>{ if(e.target===$('adminDlg')) $('adminDlg').classList.remove('on'); });
+
+// ---- boot ----
+try { const n=localStorage.getItem('cos-name'); if(n) $('fName').value=n; const s=localStorage.getItem('cos-site'); if(s) $('fSite').value=s; } catch(e){}
+applyEvent(); render();
+if (firebaseConfig.apiKey === 'PASTE_ME') { $('notice').textContent = 'Setup needed: paste your Firebase config into index.html (see README).'; $('btnUpload').disabled = true; }
+else {
+  const app = initializeApp(firebaseConfig); const auth = getAuth(app); db = getFirestore(app);
+  let started = false;
+  onAuthStateChanged(auth, async u => {
+    if (!u) { uid=null; isAdmin=false; try { await signInAnonymously(auth); } catch(e){ $('notice').textContent='Could not connect (enable Anonymous sign-in in Firebase Auth).'; } return; }
+    uid = u.uid; isAdmin = !u.isAnonymous; renderTabs();
+    if (!started) { started = true; subscribeShared(); subscribeDay(); } else render();
+  });
+  $('aGo').addEventListener('click', async ()=>{ $('aStatus').textContent='Signing in…'; try { await signInWithEmailAndPassword(auth, $('aEmail').value.trim(), $('aPass').value); $('aStatus').textContent=''; $('adminDlg').classList.remove('on'); toast('Signed in as admin.'); } catch(err){ $('aStatus').textContent='Sign-in failed: ' + (err.code||'error'); } });
+  $('aOut').addEventListener('click', async ()=>{ await signOut(auth); $('adminDlg').classList.remove('on'); toast('Signed out.'); });
+}
+</script>
+</body>
+</html>
