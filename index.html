@@ -229,6 +229,28 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 16px 30p
 </div>
 
 <script type="module">
+// ---- self-updating page: reloads when a newer copy is published (never mid-game) ----
+const PAGE_VERSION = '20261002-2300';
+(function(){
+  let busy = () => false; window.__setBusy = f => { busy = f; };
+  let pendingReload = false;
+  function reloadNow(){ const u = location.pathname + '?v=' + Date.now() + location.hash; location.replace(u); }
+  function banner(msg){ let b=document.getElementById('upd'); if(!b){ b=document.createElement('button'); b.id='upd'; b.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999;background:#e9b949;color:#1a1412;border:2px solid #1a1412;padding:10px 16px;font:700 15px Arial,sans-serif;border-radius:6px;box-shadow:0 3px 0 #000;cursor:pointer'; b.onclick=reloadNow; document.body.appendChild(b);} b.textContent=msg; }
+  async function check(){
+    try {
+      const r = await fetch(location.pathname, {cache:'no-store'}); if(!r.ok) return; const t = await r.text();
+      const m = t.match(/PAGE_VERSION = '([^']+)'/); if(!m || m[1]===PAGE_VERSION) return;
+      if (busy()) { pendingReload = true; banner('A newer version is ready. Tap to refresh when you finish.'); }
+      else reloadNow();
+    } catch(e){}
+  }
+  window.__forceRefreshSoon = function(reason){ if (busy()) banner('Connection reset. Tap to refresh when you finish.'); else reloadNow(); };
+  setTimeout(check, 1500); setInterval(check, 4*60*1000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ check(); if(pendingReload && !busy()) reloadNow(); } });
+  setInterval(()=>{ if(pendingReload && !busy()) reloadNow(); }, 15000);
+})();
+
+
 // =====================================================================
 //  SETUP: paste your Firebase web app config here (Firebase console >
 //  Project settings > Your apps > Web app > SDK setup and configuration)
@@ -254,12 +276,12 @@ const DEFAULT_EVENT = {
   vendorSites: ['Americor DR','Buwelo Colombia','Buwelo PH','Vendor Leadership'],
   days: [
     {k:'mon', on:true, label:'Monday',    theme:'Step Right Up',            date:'2026-10-05', desc:'Classic carnival: red and white stripes, bold checks, polka dots, ringmaster hats, bow ties, suspenders, vests. No time? A striped shirt and a bow tie.'},
-    {k:'tue', on:true, label:'Tuesday',   theme:'Fun House',                date:'2026-10-06', desc:'Mismatched everything: patterns, socks, shoes. Clothes inside out or backwards, wild hair, giant glasses, clashing colors. Zero shopping required.'},
-    {k:'wed', on:true, label:'Wednesday', theme:'Wicked: Clowns vs Ghosts', date:'2026-10-07', desc:'Pick a side. Team Clown: face paint, red nose, ruffled collar, wild wig. Team Ghost: all white, gauze, pale face. Silly clown is always allowed. No full-face masks in 1:1s or team meetings unless asked.'},
-    {k:'thu', on:true, label:'Thursday',  theme:'Carnival After Dark',      date:'2026-10-08', desc:'The lights went out at the carnival. All black head to toe: hoodie, beanie, hood up, dark or smoky makeup, pale face. Move slow and quiet. You are the shadow.'},
-    {k:'fri', on:true, label:'Friday',    theme:'Walking Dead',             date:'2026-10-09', desc:'Zombie version of a celebrity or character, your favorite villain, or a good ole classic zombie: torn clothes, gray face, dark eyes. Costume contest finals today.'},
-    {k:'sat', on:true, label:'Saturday',  theme:'Fun House (Weekend Warriors)', date:'2026-10-10', desc:'Mismatched everything: patterns, socks, shoes. Clothes inside out or backwards, wild hair, giant glasses, clashing colors.'},
-    {k:'sun', on:true, label:'Sunday',    theme:'Clowns vs Ghosts (Weekend Warriors)', date:'2026-10-11', desc:'Pick a side. Team Clown: face paint, red nose, ruffled collar, wild wig. Team Ghost: all white, gauze, pale face. Silly clown is always allowed.'},
+    {k:'tue', on:true, label:'Tuesday',   theme:'Fun House',                date:'2026-10-06', desc:'Turn your style upside down! Mismatched outfits, inside-out clothing, and wild hair are the look of the day. How wonderfully wacky can you get?'},
+    {k:'wed', on:true, label:'Wednesday', theme:'Wicked: Clowns vs Ghosts', date:'2026-10-07', desc:'Pick your spooky side! Creepy clowns versus ghosts: will you bring a sinister smile or a haunting entrance? Silly clown is always allowed. No full-face masks in 1:1s or team meetings unless asked.'},
+    {k:'thu', on:true, label:'Thursday',  theme:'Carnival After Dark',      date:'2026-10-08', desc:'Step into the shadows! Go all black and bring your mysterious carnival style. The midway looks different after dark…'},
+    {k:'fri', on:true, label:'Friday',    theme:'Walking Dead',             date:'2026-10-09', desc:'Give your look an undead twist! Transform a celebrity or villain into a zombie, or bring your best classic zombie shuffle!'},
+    {k:'sat', on:true, label:'Saturday',  theme:'Fun House (Weekend Warriors)', date:'2026-10-10', desc:'Turn your style upside down! Mismatched outfits, inside-out clothing, and wild hair are the look of the day. How wonderfully wacky can you get?'},
+    {k:'sun', on:true, label:'Sunday',    theme:'Clowns vs Ghosts (Weekend Warriors)', date:'2026-10-11', desc:'Pick your spooky side! Creepy clowns versus ghosts: will you bring a sinister smile or a haunting entrance? Silly clown is always allowed.'},
   ]
 };
 const ALL_KEYS = ['mon','tue','wed','thu','fri','sat','sun'];
@@ -297,6 +319,7 @@ function readEventForm(){
     sites: $('eSites').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 12), vendorSites: $('eVendor').value.split(',').map(x => x.trim()).filter(Boolean), days };
 }
 const $ = id => document.getElementById(id);
+window.__setBusy(() => false);
 const esc = s => String(s == null ? '' : s);
 
 let db = null, uid = null, isAdmin = false;
@@ -369,7 +392,7 @@ function subscribeDay(){
   photos=[]; render(); if (!db) return;
   unsubPhotos = onSnapshot(query(collection(db,'photos'), where('day','==',day)), snap => {
     photos = snap.docs.map(d => Object.assign({id:d.id}, d.data())); render();
-  }, e => { $('notice').textContent = 'Live updates stopped (' + e.code + '). Reload the page.'; });
+  }, e => { $('notice').textContent = 'Live updates stopped (' + e.code + '). Reloading…'; window.__forceRefreshSoon(e.code); });
 }
 function subscribeShared(){
   onSnapshot(collection(db,'votes'), snap => {
